@@ -1,0 +1,4 @@
+# NFA to DFA
+Just a repo built for demonstrating NFA determinization.
+
+lexer/parser implemented with MGCPGen

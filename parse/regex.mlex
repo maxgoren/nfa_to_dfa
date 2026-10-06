@@ -1,0 +1,12 @@
+{"\(",LPAREN}
+{"\)",RPAREN}
+{"\[",LSQB}
+{"\]",RSQB}
+{"\-",DASH}
+{"\*",KLEENE_STAR}
+{"\|",OR}
+{"\^",NEGATE}
+{"[.]",PERIOD}
+{"[?]",QMARK}
+{"[+]",KLEENE_PLUS}
+{"[A-Za-z0-9]",LETTER}
