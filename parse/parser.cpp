@@ -5,7 +5,7 @@ Token& Parser::current() {
     return tokens[tpos];
 }
 void Parser::advance() {
-    if (tpos < tokens.size() && tokens[tpos].getSymbol() != TK_EOI) {
+    if (tpos+1 < tokens.size() && tokens[tpos].getSymbol() != TK_EOI) {
         tpos++;
     }
 }

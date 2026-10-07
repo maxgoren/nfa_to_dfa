@@ -12,7 +12,13 @@ void preorder(astnode* ast, int n) {
 }
 
 astnode* pass(vector<astnode*>& r) {
-    return r[1];
+    swap(r[1],r[2]);
+    auto ret = r.back();
+    r.pop_back();
+    for (auto & m : r) {
+        delete m;
+    }
+    return ret;
 }
 
 astnode* mkLeaf(vector<astnode*>& r) {

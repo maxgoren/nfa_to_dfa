@@ -42,7 +42,7 @@ bool matchNFA(NFA& nfa, string text) {
 bool matchDFA(DFA& dfa, string expr) {
     DFAState* state = dfa.states[0];
     for (int i = 0; i < expr.size(); i++) {
-        cout<<state->label<<" "<<expr[i]<<endl;;
+        cout<<state->label<<" "<<expr[i]<<" -> ";
         DFAState* next = nullptr;
         if (state->trans.find(expr[i]) != state->trans.end()) {
             next = state->trans[expr[i]];
@@ -53,12 +53,13 @@ bool matchDFA(DFA& dfa, string expr) {
             return true;
         } else state = next;
     }
+    cout<<endl;
     return state != nullptr;
 }
 
-void repl(string pattern, string text) {
-    Lexer lexer;
-    Parser parser(false);
+DFA makeDFA(string pattern) {
+    Lexer lexer(true);
+    Parser parser(true);
     bool running = true;
     string buffer;
     StringBuffer sb;
@@ -68,16 +69,33 @@ void repl(string pattern, string text) {
     preorder(ret, 1);
     RECompiler rec;
     NFA nfa = rec.compile(ret);
-    DFA dfa = makeDeterministic(nfa, pattern);
+    return makeDeterministic(nfa, pattern);
+}
+
+void match(string pattern, string text) {
+    DFA dfa = makeDFA(pattern);
     if (matchDFA(dfa, text)) {
-        cout<<"Yep, match found."<<endl;
+        cout<<"Match Found."<<endl;
     }
 }
 
+
+void match_from_stdin(string pattern) {
+    DFA dfa = makeDFA(pattern);
+    char buffer[1028];
+    while (fgets(buffer, 1024, stdin)) {
+        if (matchDFA(dfa, buffer)) {
+            cout<<buffer<<endl;
+        } else {
+            cout<<"(X) - Failed."<<endl;
+        }
+    }
+}
     
     
 
 int main(int argc, char* argv[]) {
-    if (argc < 3) return -1;
-    repl(argv[1], argv[2]);
+    if (argc < 2) return -1;
+    if (argc < 3) match_from_stdin(argv[1]);
+    else match(argv[1], argv[2]);
 }
