@@ -11,6 +11,7 @@ repexpr ::= val QMARK   @mkOpt
 repexpr ::= val
 val ::= LPAREN regex RPAREN  @pass
 val ::= LETTER               @mkLeaf
+val ::= PERIOD               @mkLeaf
 val ::= LSQB optneg cclist RSQB     @mkCcl
 optneg ::= NEGATE
 optneg ::= #

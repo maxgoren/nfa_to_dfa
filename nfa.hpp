@@ -73,26 +73,27 @@ class RECompiler {
             ns->addTransition(Transition(ch, ts));
             return NFA(ns, ts);
         }
-        void makeRangeClassTrans(NFAState* ns, NFAState* ts, astnode* ast, bool negate, int spos) {
+        void makeRangeClassTrans(NFAState*& ns, NFAState*& ts, astnode* ast, bool negate, int spos) {
             char lo = ast->children[0]->token.getString()[0], hi = ast->children[1]->token.getString()[0];
             if (negate == false) {
+                cout<<"Add em, "<<lo<<" - "<<hi<<endl;
                 for (char t = lo; t <= hi; t++)
                     ns->addTransition(Transition(t, ts));
-                return;
-            }
-            for (char t = '0'; t < lo; t++)
-                ns->addTransition(Transition(t, ts));
-            for (char t = hi+1; t <= '~'; t++)
-                ns->addTransition(Transition(t, ts));   
+            } else {
+                for (char t = (char)14; t < lo; t++)
+                    ns->addTransition(Transition(t, ts));
+                for (char t = hi+1; t <= '~'; t++)
+                    ns->addTransition(Transition(t, ts));
+            }   
         }
-        void makeRegClassTrans(NFAState* ns, NFAState* ts, string ccl, bool negate, int spos) {
+        void makeRegClassTrans(NFAState*& ns, NFAState*& ts, string ccl, bool negate, int spos) {
             if (negate == false) {
                 ns->addTransition(Transition(ccl[spos], ts));
-                return;
-            }
-            for (char t = '0'; t <= '~'; t++) {
-                if (ccl.find(t) == std::string::npos && !ns->hasTransition(Transition(t, ts))) {
-                    ns->addTransition(Transition(t, ts));
+            } else {
+                for (char t = (char)14; t <= '~'; t++) {
+                    if (ccl.find(t) == std::string::npos && !ns->hasTransition(Transition(t, ts))) {
+                        ns->addTransition(Transition(t, ts));
+                    }
                 }
             }
         }

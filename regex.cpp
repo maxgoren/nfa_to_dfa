@@ -54,7 +54,7 @@ bool matchDFA(DFA& dfa, string expr) {
         } else state = next;
     }
     cout<<endl;
-    return state != nullptr;
+    return state != nullptr && state->accepts;
 }
 
 DFA makeDFA(string pattern) {

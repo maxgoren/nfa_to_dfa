@@ -17,10 +17,24 @@ set<char> buildAlphabet(string expr) {
         char c = expr[i];
         if (isalpha(c) && !aleph.count(c)) { 
             aleph.insert(c);
-        } else if (c == '.' && (i == 0 || expr[i-1] == '\\')) {
-            for (int i = 20; i < 128; i++)
-                aleph.insert((char)i);
-        } // and so on for character classes
+        } else if (c == '.' && (i == 0 || expr[i-1] != '\\')) {
+            for (int y = 20; y < 128; y++)
+                aleph.insert((char)y);
+        } else if (c == '[') {
+            int j = i+1;
+            while (expr[j] != ']') {
+                if (expr[j+1] == '-') {
+                    char lo = expr[j], hi = expr[j+2];
+                    for (char m = lo; m <= hi; m++)
+                        aleph.insert(m);
+                    j+=2;
+                } else {
+                    aleph.insert(expr[j]);
+                    j++;
+                }
+            }
+            i = j;
+        }
     }
     return aleph;
 }
