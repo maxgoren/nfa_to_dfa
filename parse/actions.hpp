@@ -15,6 +15,6 @@ astnode* mkOpt(vector<astnode*>& r);
 astnode* mkList(vector<astnode*>& r);
 astnode* mkCCLRange(vector<astnode*>& r);
 astnode* mkCcl(vector<astnode*>& r);
-
+astnode* mkEscaped(vector<astnode*>& r);
 
 #endif

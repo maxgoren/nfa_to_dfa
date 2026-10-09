@@ -19,7 +19,7 @@ class Parser {
         bool debug_noise;
         Token& current();
         void advance();
-        void doShift(int next);
+        bool doShift(int next);
         void doReduce(int next);
         void printCurrent(int state_num, Token& T);
         int getNext(const int *table[], int state, int sym);

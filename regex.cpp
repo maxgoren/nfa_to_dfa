@@ -4,9 +4,9 @@
 #include "parse/lexer.hpp"
 #include "parse/parser.hpp"
 #include "parse/buffer.hpp"
-#include "nfa.hpp"
-#include "dfa.hpp"
-#include "powerset.hpp"
+#include "automata/nfa.hpp"
+#include "automata/dfa.hpp"
+#include "automata/powerset.hpp"
 using namespace std;
 
 
@@ -58,8 +58,8 @@ bool matchDFA(DFA& dfa, string expr) {
 }
 
 DFA makeDFA(string pattern) {
-    Lexer lexer(true);
-    Parser parser(true);
+    Lexer lexer(false);
+    Parser parser(false);
     bool running = true;
     string buffer;
     StringBuffer sb;

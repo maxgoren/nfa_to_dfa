@@ -1,6 +1,6 @@
 #ifndef nfa_hpp
 #define nfa_hpp
-#include "parse/ast.hpp"
+#include "../parse/ast.hpp"
 #include <vector>
 #include <stack>
 #include <map>

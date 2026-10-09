@@ -26,6 +26,14 @@ astnode* mkLeaf(vector<astnode*>& r) {
     return r[0];    
 }
 
+astnode* mkEscaped(vector<astnode*>& r) {
+    r[1]->type = CONST_EXPR;
+    r[1]->token.setString("\\"+r[1]->token.getString());
+    delete r[0];
+    return r[1];
+}
+
+
 astnode* mkKleene(vector<astnode*>& r) {
     r[1]->type = KLEENE_EXPR;
     r[1]->children[0] = r[0];
@@ -40,6 +48,10 @@ astnode* mkOpt(vector<astnode*>& r) {
 
 astnode* mkConcat(vector<astnode*>& r) {
     cout<<"Concat from "<<r.size()<<" items: "<<endl;
+    preorder(r[0],1);
+    cout<<"\n And \n";
+    preorder(r[1],1);
+    cout<<endl;
     astnode* cc = new astnode(r[0]->token);
     cc->token.setString("@");
     cc->type = CONCAT_EXPR;

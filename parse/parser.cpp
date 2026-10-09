@@ -23,12 +23,15 @@ Parser::Parser(bool loud) {
     debug_noise = loud;
 }
 
-void Parser::doShift(int next) {
+bool Parser::doShift(int next) {
     if (debug_noise)
         cout<<"SHIFT "<<current().getString()<<endl;
+    if (current().getString() == "<fin>")
+        return true;
     st.push(next);
     semStack.push(new astnode(current()));
     advance();
+    return false;
 }
 
 vector<astnode*> Parser::removeFromStack(int numSym) {
@@ -107,7 +110,8 @@ astnode* Parser::parse(vector<Token>& tok) {
     tpos = 0;
     st.push(0);
     int curr_state = 0;
-    for (;;) {
+    bool eoi = false;
+    for (;!eoi;) {
         Token curr_token = current();
         curr_state = st.top();
         int action = getNext(actTab, curr_state, curr_token.getSymbol());
@@ -119,9 +123,7 @@ astnode* Parser::parse(vector<Token>& tok) {
             }
             int rule = actTab[curr_state][action];
             if (rule > 0) {
-                if (current().getString() == "<fin>")
-                    return cleanUpAndAccept();
-                doShift(rule);
+                eoi = doShift(rule);
             } else if (rule < 0) {
                 doReduce(rule);
             } else {

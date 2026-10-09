@@ -5,8 +5,9 @@
 {"\-",DASH}
 {"\*",KLEENE_STAR}
 {"\|",OR}
+{"[\]",ESCAPE}
 {"\^",NEGATE}
 {"[.]",PERIOD}
 {"[?]",QMARK}
 {"[+]",KLEENE_PLUS}
-{"[A-Za-z0-9]",LETTER}
+{".",CHAR}

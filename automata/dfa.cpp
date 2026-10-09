@@ -2,6 +2,7 @@
 #include "powerset.hpp"
 #include <queue>
 #include <set>
+#include <algorithm>
 
 DFAState* makeDFAState(int label, set<NFAState*>& pos) {
     DFAState* d = new DFAState();
@@ -95,3 +96,4 @@ DFA makeDeterministic(NFA& nfa, string expr) {
     }
     return dfa;
 }
+

@@ -23,6 +23,7 @@ struct DFA {
 
 DFA makeDeterministic(NFA& nfa, string expr);
 
+DFA minimize(DFA& dfa, string expr, set<char>& alphabet);
 
 
 #endif
