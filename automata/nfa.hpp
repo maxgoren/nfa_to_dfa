@@ -73,42 +73,38 @@ class RECompiler {
             ns->addTransition(Transition(ch, ts));
             return NFA(ns, ts);
         }
-        void makeRangeClassTrans(NFAState*& ns, NFAState*& ts, astnode* ast, bool negate, int spos) {
+        string expandRangeClassTrans(NFAState*& ns, NFAState*& ts, astnode* ast, bool negate, int spos) {
+            string result;
             char lo = ast->children[0]->token.getString()[0], hi = ast->children[1]->token.getString()[0];
-            if (negate == false) {
-                cout<<"Add em, "<<lo<<" - "<<hi<<endl;
-                for (char t = lo; t <= hi; t++)
-                    ns->addTransition(Transition(t, ts));
-            } else {
-                for (char t = (char)14; t < lo; t++)
-                    ns->addTransition(Transition(t, ts));
-                for (char t = hi+1; t <= '~'; t++)
-                    ns->addTransition(Transition(t, ts));
-            }   
+            for (char t = lo; t <= hi; t++)
+                result.push_back(t);
+            return result;
         }
-        void makeRegClassTrans(NFAState*& ns, NFAState*& ts, string ccl, bool negate, int spos) {
-            if (negate == false) {
-                ns->addTransition(Transition(ccl[spos], ts));
-            } else {
-                for (char t = (char)14; t <= '~'; t++) {
-                    if (ccl.find(t) == std::string::npos && !ns->hasTransition(Transition(t, ts))) {
-                        ns->addTransition(Transition(t, ts));
-                    }
-                }
-            }
-        }
+
         NFA makeCharClass(astnode* node) {
             NFAState* ns = makeState(nextLabel());
             NFAState* ts = makeState(nextLabel());
             astnode* itr = node->children[0];
             bool negate = node->children[1] != nullptr && node->children[1]->token.getString() == "^";
+            string result = "";
             while (itr != nullptr) {
                 if (itr->type == RANGE_EXPR) {
-                    makeRangeClassTrans(ns, ts, itr, negate, 0);
+                    result += expandRangeClassTrans(ns, ts, itr, negate, 0);
                 } else {
-                    makeRegClassTrans(ns, ts, itr->token.getString(), negate, 0);
+                    result += itr->token.getString();
                 }
                 itr = itr->next;
+            }
+            if (negate) {
+                for (char c = (char)15; c <= '~'; c++) {
+                    if (result.find(c) == result.npos) {
+                        ns->addTransition(Transition(c, ts));
+                    }
+                }
+            } else {
+                for (char c : result) {
+                    ns->addTransition(Transition(c, ts));
+                }
             }
             return NFA(ns, ts);
         }

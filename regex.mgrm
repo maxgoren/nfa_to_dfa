@@ -1,5 +1,5 @@
 terminal_list regex.mlex
-type_returned astnode
+type_returned astnode*
 sp ::= regex
 regex ::= regex OR catexpr   @mkOr
 regex ::= catexpr
@@ -13,9 +13,8 @@ val ::= LPAREN regex RPAREN  @pass
 val ::= CHAR                 @mkLeaf
 val ::= PERIOD               @mkLeaf
 val ::= ESCAPE CHAR          @mkEscaped
-val ::= LSQB optneg cclist RSQB     @mkCcl
-optneg ::= NEGATE
-optneg ::= #
+val ::= LSQB cclist RSQB     @mkCcl
+val ::= LSQB NEGATE cclist RSQB @mkNegCcl
 cclist ::= cclist ccent      @mkList
 cclist ::= ccent
 ccent ::= CHAR DASH CHAR     @mkCCLRange

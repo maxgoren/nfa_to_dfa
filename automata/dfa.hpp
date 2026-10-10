@@ -24,6 +24,6 @@ struct DFA {
 DFA makeDeterministic(NFA& nfa, string expr);
 
 DFA minimize(DFA& dfa, string expr, set<char>& alphabet);
-
+DFA rebuildMinimal(DFA& dfa, vector<set<int>>& groups, set<char>& alphabet);
 
 #endif

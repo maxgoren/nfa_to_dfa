@@ -59,7 +59,7 @@ bool matchDFA(DFA& dfa, string expr) {
 
 DFA makeDFA(string pattern) {
     Lexer lexer(false);
-    Parser parser(false);
+    Parser parser(true);
     bool running = true;
     string buffer;
     StringBuffer sb;

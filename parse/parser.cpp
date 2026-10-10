@@ -5,14 +5,17 @@ Token& Parser::current() {
     return tokens[tpos];
 }
 void Parser::advance() {
-    if (tpos+1 < tokens.size() && tokens[tpos].getSymbol() != TK_EOI) {
+    if (tpos < tokens.size() && tokens[tpos].getSymbol() != TK_EOI) {
         tpos++;
     }
 }
 int Parser::getNext(const int *table[], int state, int sym) {
     int N = table[state][0];
-    for (int i = 1; i < 2*N+1; i+=2) {
-        if (table[state][i] == sym || sym == TK_EOI && table[state][i] == DOLLARACCEPT) {
+    for (int i = 1, j = 1; i < (2*N)+1; i+=2, j++) {
+        if ((table[state][i] == sym)) {
+            return i+1;
+        }
+        if ((sym == TK_EOI && table[state][i] == DOLLARACCEPT)) {
             return i+1;
         }
     }
@@ -110,12 +113,12 @@ astnode* Parser::parse(vector<Token>& tok) {
     tpos = 0;
     st.push(0);
     int curr_state = 0;
-    bool eoi = false;
-    for (;!eoi;) {
+    for (;;) {
         Token curr_token = current();
         curr_state = st.top();
         int action = getNext(actTab, curr_state, curr_token.getSymbol());
         if (action == PARSE_ERR) {
+            cout<<"(error.)"<<endl;
            return syntaxError(curr_state, curr_token);
         } else {
             if (debug_noise) {
@@ -123,10 +126,11 @@ astnode* Parser::parse(vector<Token>& tok) {
             }
             int rule = actTab[curr_state][action];
             if (rule > 0) {
-                eoi = doShift(rule);
+                doShift(rule);
             } else if (rule < 0) {
                 doReduce(rule);
             } else {
+                cout<<"(ACCEPT)"<<endl;
                 return cleanUpAndAccept();
             }
         }

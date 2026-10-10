@@ -81,9 +81,14 @@ astnode* mkCCLRange(vector<astnode*>& r) {
 }
 
 astnode* mkCcl(vector<astnode*>& r) {
+    r[0]->children[0] = r[1];
+    r[0]->type = CCL_EXPR;
+    return r[0];
+}
+
+astnode* mkNegCcl(vector<astnode*>& r) {
     r[0]->children[0] = r[2];
     r[0]->type = CCL_EXPR;
-    if (r[1]->token.getString() != "Epsilon")
-        r[0]->children[1] = r[1];
+    r[0]->children[1] = r[1];
     return r[0];
 }
