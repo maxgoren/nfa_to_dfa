@@ -111,47 +111,43 @@ DFA makeDeterministic(NFA& nfa, string expr) {
     return minimize(dfa, expr, aleph);
 }
 
-int map_old_dest(vector<set<int>>& groups, int old) {
-    bool breakout = false;
-    for (int i = 0; i < groups.size(); i++) {
-        for (auto j : groups[i]) {
-            if (j == old) {
-                return i;
-            }
-        }
-    }
-    return -1;
-}
-
-DFA minimize(DFA& dfa, string expr, set<char>& alphabet) {
-    typedef int STATE;
-    typedef set<STATE> GROUP;
-    vector<GROUP> groups= {{}, {}};
+vector<set<int>> initGroups(DFA& dfa, map<int,int>& in_group) {
+    vector<set<int>> groups= {{}, {}};
     for (int i = 0; i < dfa.num_states; i++) {
         if (dfa.states[i]->accepts) {
             groups[1].insert(i);
+            in_group[i] = 1;
         } else {
             groups[0].insert(i);
+            in_group[i] = 0;
         }
     }
+    return groups;
+}
+
+DFA minimize(DFA& dfa, string expr, set<char>& alphabet) {
+    map<int,int> in_group;
+    vector<set<int>> groups = initGroups(dfa, in_group);
     bool didchange = false;
     do {
         didchange = false;
-        for (GROUP& group : groups) {
-            GROUP ng;
+        for (set<int>& group : groups) {
+            set<int> ng;
             auto it = group.begin();
             int first = *it++;
             int next = it != group.end() ? *it++:0;
             while (next != 0) {
                 for (char c : alphabet) {
-                    STATE gtf = -1, gtn = -1;
+                    int gtf = -1, gtn = -1;
                     if (dfa.states[first]->trans.find(c) != dfa.states[first]->trans.end()) {
                         gtf = dfa.states[first]->trans[c]->label;
                     }
                     if (dfa.states[next]->trans.find(c) != dfa.states[next]->trans.end()) {
                         gtn = dfa.states[next]->trans[c]->label;
                     }
-                    if (gtf != gtn) {
+                    int first_group = in_group[gtf]; 
+                    int next_group = in_group[gtn]; 
+                    if (first_group != next_group) {
                         ng.insert(next);
                     }
                 }
@@ -159,8 +155,10 @@ DFA minimize(DFA& dfa, string expr, set<char>& alphabet) {
                 it++;
             }
             if (!ng.empty()) {
-                for (STATE s : ng) {
+                //remember: we're *moving* states to new partitions, not copying them.
+                for (int s : ng) {
                     group.erase(s);
+                    in_group[s] = groups.size();
                 }
                 groups.push_back(ng);
                 didchange = true;
@@ -170,10 +168,10 @@ DFA minimize(DFA& dfa, string expr, set<char>& alphabet) {
             }
         }
     } while (didchange);
-    return rebuildMinimal(dfa, groups, alphabet);
+    return rebuildMinimal(dfa, groups, alphabet, in_group);
 }
 
-DFA rebuildMinimal(DFA& dfa, vector<set<int>>& groups, set<char>& alphabet) {
+DFA rebuildMinimal(DFA& dfa, vector<set<int>>& groups, set<char>& alphabet, map<int,int>& in_group) {
     DFA result;
     result.num_states = groups.size();
     for (int i = 0; i < result.num_states; i++) {
@@ -185,7 +183,7 @@ DFA rebuildMinimal(DFA& dfa, vector<set<int>>& groups, set<char>& alphabet) {
         int rep = *groups[i].begin();
         for (char c : alphabet) {
             if (dfa.states[rep]->trans.count(c)) {
-                int ndst = map_old_dest(groups, dfa.states[rep]->trans[c]->label);
+                int ndst = in_group[dfa.states[rep]->trans[c]->label];
                 if (ndst != -1) {
                     cout<<"Add transition "<<i<<" -> "<<c<<" -> "<<ndst<<endl;
                     result.states[i]->trans[c] = result.states[ndst];
